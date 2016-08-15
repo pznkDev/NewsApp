@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NewsUSA</string>
+    <string name="toolbar_search">search</string>
+</resources>
