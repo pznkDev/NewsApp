@@ -1,20 +1,30 @@
 package slava.kpi.com.newsusa;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-public class MainActivity extends Activity {
+import slava.kpi.com.newsusa.adapter.TabsPagerFragmentAdapter;
+
+public class MainActivity extends AppCompatActivity  {
 
     private Toolbar toolbar;
 
+    private TabLayout tabLayout;
+
+    private ViewPager viewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppDefault);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initToolbar();
+        initTabs();
 
     }
 
@@ -28,5 +38,15 @@ public class MainActivity extends Activity {
             }
         });
         toolbar.inflateMenu(R.menu.toolbar_menu);
+    }
+
+    private void initTabs() {
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        TabsPagerFragmentAdapter adapter = new TabsPagerFragmentAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+
     }
 }
