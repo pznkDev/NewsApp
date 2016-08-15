@@ -1,20 +1,18 @@
-package slava.kpi.com.newsusa;
+package slava.kpi.com.newsusa.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import slava.kpi.com.newsusa.R;
 import slava.kpi.com.newsusa.adapter.TabsPagerFragmentAdapter;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends BaseActivity  {
 
     private Toolbar toolbar;
-
     private TabLayout tabLayout;
-
     private ViewPager viewPager;
 
     @Override
@@ -25,7 +23,6 @@ public class MainActivity extends AppCompatActivity  {
 
         initToolbar();
         initTabs();
-
     }
 
     private void initToolbar() {
@@ -42,11 +39,10 @@ public class MainActivity extends AppCompatActivity  {
 
     private void initTabs() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        TabsPagerFragmentAdapter adapter = new TabsPagerFragmentAdapter(getSupportFragmentManager());
+        TabsPagerFragmentAdapter adapter = new TabsPagerFragmentAdapter(getApplicationContext(), getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-
     }
 }

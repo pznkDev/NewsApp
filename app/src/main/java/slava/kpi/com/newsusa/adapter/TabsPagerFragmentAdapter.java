@@ -1,18 +1,25 @@
 package slava.kpi.com.newsusa.adapter;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import slava.kpi.com.newsusa.R;
 import slava.kpi.com.newsusa.fragments.AllNewsFragment;
+import slava.kpi.com.newsusa.fragments.FavouriteNewsFragment;
+import slava.kpi.com.newsusa.fragments.OtherNewsFragment;
 
 public class TabsPagerFragmentAdapter extends FragmentPagerAdapter{
 
     private String[] tabs;
 
-    public TabsPagerFragmentAdapter(FragmentManager fm) {
+    public TabsPagerFragmentAdapter(Context context, FragmentManager fm) {
         super(fm);
-        tabs = new String[] {"All", "Other", "Favourite"};
+
+        tabs = new String[] {context.getResources().getString(R.string.tab_all),
+                            context.getResources().getString(R.string.tab_other),
+                            context.getResources().getString(R.string.tab_favourite)};
     }
 
     @Override
@@ -23,10 +30,10 @@ public class TabsPagerFragmentAdapter extends FragmentPagerAdapter{
                 return AllNewsFragment.getInstance();
 
             case 1:
-                return AllNewsFragment.getInstance();
+                return OtherNewsFragment.getInstance();
 
             case 2:
-                return AllNewsFragment.getInstance();
+                return FavouriteNewsFragment.getInstance();
         }
         return null;
     }

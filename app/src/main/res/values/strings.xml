@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">NewsUSA</string>
     <string name="toolbar_search">search</string>
+
+    <string name="tab_all">All news</string>
+    <string name="tab_other">Others</string>
+    <string name="tab_favourite">Favourites</string>
 </resources>
