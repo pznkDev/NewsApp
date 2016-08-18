@@ -11,6 +11,7 @@ import slava.kpi.com.newsusa.adapter.TabsPagerFragmentAdapter;
 
 public class MainActivity extends BaseActivity  {
 
+    public static final int NEWSCOUNT = 10;
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;

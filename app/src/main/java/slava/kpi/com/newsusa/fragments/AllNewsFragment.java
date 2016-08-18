@@ -5,7 +5,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import slava.kpi.com.newsusa.R;
+import slava.kpi.com.newsusa.adapter.ShortArticleListAdapter;
 import slava.kpi.com.newsusa.entities.ArticleShort;
+import slava.kpi.com.newsusa.listeners.EndlessRecyclerOnScrollListener;
 
 public class AllNewsFragment extends Fragment {
 
@@ -41,6 +44,11 @@ public class AllNewsFragment extends Fragment {
 
     private boolean flagSuccess = false;
 
+    private RecyclerView rvShortArticle;
+    ShortArticleListAdapter shortArticleListAdapter;
+    private EndlessRecyclerOnScrollListener recyclerOnScrollListener;
+
+
     public static AllNewsFragment getInstance() {
         Bundle args = new Bundle();
         AllNewsFragment allNewsFragment = new AllNewsFragment();
@@ -56,9 +64,28 @@ public class AllNewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
+        rvShortArticle = (RecyclerView) view.findViewById(R.id.rec_view_short_article_list);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvShortArticle.setLayoutManager(layoutManager);
+
+        recyclerOnScrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                // TODO load next news
+            }
+        };
+        rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
+        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getAllNews());
+        rvShortArticle.setAdapter(shortArticleListAdapter);
+
         if (allNews.size() == 0) new LoadNews().execute(URL);
 
         return view;
+    }
+
+    private List<ArticleShort> getAllNews() {
+        return allNews;
     }
 
     private class LoadNews extends AsyncTask<String, String, String> {
@@ -95,8 +122,8 @@ public class AllNewsFragment extends Fragment {
                         else imgURL = "";
                         // create new short article and add it to list
                         allNews.add(new ArticleShort(part.select("h3").first().text(), imgURL,
-                                                    part.select("a").first().attr("href"),
-                                                    part.select("p.date").first().text()));
+                                part.select("a").first().attr("href"),
+                                part.select("p.date").first().text()));
                     }
                 }
 
@@ -109,9 +136,11 @@ public class AllNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
-            if (flagSuccess)
+            if (flagSuccess) {
                 Toast.makeText(getContext(), "Success" + allNews.size(), Toast.LENGTH_SHORT).show();
+                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size(), allNews.size()+30);
+
+            }
             else Toast.makeText(getContext(), "Error" + allNews.size(), Toast.LENGTH_SHORT).show();
 
             progressDialog.cancel();
