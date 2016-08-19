@@ -1,11 +1,11 @@
 package slava.kpi.com.newsusa.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,24 +32,20 @@ import slava.kpi.com.newsusa.listeners.EndlessRecyclerOnScrollListener;
 public class AllNewsFragment extends Fragment {
 
     public static final String TAG = "AllNewsFragment";
-
     private final String LOG_TAG = "myTag";
-
-    private final String URL = "http://www.sandiegouniontribune.com/news/national-news/california/";
 
     private final int LAYOUT = R.layout.fragment_all_news;
 
     private View view;
-
-    private ProgressDialog progressDialog;
 
     private Document doc;
 
     private boolean flagSuccess = false;
 
     private RecyclerView rvShortArticle;
-    ShortArticleListAdapter shortArticleListAdapter;
+    private ShortArticleListAdapter shortArticleListAdapter;
     private EndlessRecyclerOnScrollListener recyclerOnScrollListener;
+    private SwipeRefreshLayout swipeRefresh;
 
     public static AllNewsFragment getInstance() {
         Bundle args = new Bundle();
@@ -70,12 +66,11 @@ public class AllNewsFragment extends Fragment {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvShortArticle.setLayoutManager(layoutManager);
-
+        // load news on next page when approaching to the end of list
         recyclerOnScrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                // TODO load next news
-                Toast.makeText(getContext(), "Load More News", Toast.LENGTH_SHORT).show();
+                getNewsOnPage(current_page);
             }
         };
         rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
@@ -86,17 +81,38 @@ public class AllNewsFragment extends Fragment {
         shortArticleListAdapter.setArticleListener(new ShortArticleListAdapter.OnArticleClickListener() {
             @Override
             public void onClick(String articleFullURL, String title) {
+                String finalArticleFullURL = Constants.URL_ARTICLE_SHORT + articleFullURL;
                 Intent articleFullIntent = new Intent(getActivity(), ArticleFullActivity.class);
                 articleFullIntent.putExtra(Constants.EXTRA_TITLE, title);
-                articleFullIntent.putExtra(Constants.EXTRA_ARTICLE_FULL_URL, articleFullURL);
+                articleFullIntent.putExtra(Constants.EXTRA_ARTICLE_FULL_URL, finalArticleFullURL);
                 startActivity(articleFullIntent);
             }
         });
 
+        //refresh recyclerView
+        //clear all news in List, clear adapterList
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_all_news);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                shortArticleListAdapter.notifyItemRangeRemoved(0, allNews.size());
+                allNews.clear();
+                recyclerOnScrollListener.refresh();
+                getNewsOnPage(1);
+                swipeRefresh.setRefreshing(false);
+            }
+        });
 
-        if (allNews.size() == 0) new LoadNews().execute(URL);
+        // if launch first time -> load first 30 news
+        if (allNews.size() == 0) getNewsOnPage(1);
 
         return view;
+    }
+
+    private void getNewsOnPage(int page) {
+        String fullURL = Constants.URL_NEWS;
+        if (page>1) fullURL = fullURL + "?page=" + page;
+        new LoadNews().execute(fullURL);
     }
 
     private List<ArticleShort> getAllNews() {
@@ -108,10 +124,6 @@ public class AllNewsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setTitle("Loading News");
-            progressDialog.setIndeterminate(false);
-            progressDialog.show();
         }
 
         @Override
@@ -152,12 +164,11 @@ public class AllNewsFragment extends Fragment {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (flagSuccess) {
-                Toast.makeText(getContext(), "Success" + allNews.size(), Toast.LENGTH_SHORT).show();
-                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size(), allNews.size()+30);
+                Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size()-30, allNews.size());
             }
-            else Toast.makeText(getContext(), "Error" + allNews.size(), Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getContext(), "Oops, something went wrong" + allNews.size(), Toast.LENGTH_SHORT).show();
 
-            progressDialog.cancel();
         }
     }
 }

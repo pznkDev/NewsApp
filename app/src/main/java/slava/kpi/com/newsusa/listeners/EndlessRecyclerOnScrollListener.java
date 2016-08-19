@@ -6,11 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import slava.kpi.com.newsusa.activities.MainActivity;
 
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
-    public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
 
     private int previousTotal = MainActivity.NEWSCOUNT-1;
     private boolean loading = true;
-    private int visibleThreshold = 7;
+    private int visibleThreshold = 20;
     int firstVisibleItem, visibleItemCount, totalItemCount;
 
     private int current_page = 1;
