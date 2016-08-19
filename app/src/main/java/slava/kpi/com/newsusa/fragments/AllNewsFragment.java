@@ -1,6 +1,7 @@
 package slava.kpi.com.newsusa.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,7 +22,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import slava.kpi.com.newsusa.Constants;
 import slava.kpi.com.newsusa.R;
+import slava.kpi.com.newsusa.activities.ArticleFullActivity;
 import slava.kpi.com.newsusa.adapter.ShortArticleListAdapter;
 import slava.kpi.com.newsusa.entities.ArticleShort;
 import slava.kpi.com.newsusa.listeners.EndlessRecyclerOnScrollListener;
@@ -48,7 +51,6 @@ public class AllNewsFragment extends Fragment {
     ShortArticleListAdapter shortArticleListAdapter;
     private EndlessRecyclerOnScrollListener recyclerOnScrollListener;
 
-
     public static AllNewsFragment getInstance() {
         Bundle args = new Bundle();
         AllNewsFragment allNewsFragment = new AllNewsFragment();
@@ -73,11 +75,24 @@ public class AllNewsFragment extends Fragment {
             @Override
             public void onLoadMore(int current_page) {
                 // TODO load next news
+                Toast.makeText(getContext(), "Load More News", Toast.LENGTH_SHORT).show();
             }
         };
         rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
         shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getAllNews());
         rvShortArticle.setAdapter(shortArticleListAdapter);
+
+        // set Listener for rec view adapter. Tap on short article -> open new Activity fro detailed info
+        shortArticleListAdapter.setArticleListener(new ShortArticleListAdapter.OnArticleClickListener() {
+            @Override
+            public void onClick(String articleFullURL, String title) {
+                Intent articleFullIntent = new Intent(getActivity(), ArticleFullActivity.class);
+                articleFullIntent.putExtra(Constants.EXTRA_TITLE, title);
+                articleFullIntent.putExtra(Constants.EXTRA_ARTICLE_FULL_URL, articleFullURL);
+                startActivity(articleFullIntent);
+            }
+        });
+
 
         if (allNews.size() == 0) new LoadNews().execute(URL);
 
@@ -139,7 +154,6 @@ public class AllNewsFragment extends Fragment {
             if (flagSuccess) {
                 Toast.makeText(getContext(), "Success" + allNews.size(), Toast.LENGTH_SHORT).show();
                 rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size(), allNews.size()+30);
-
             }
             else Toast.makeText(getContext(), "Error" + allNews.size(), Toast.LENGTH_SHORT).show();
 

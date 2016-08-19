@@ -5,4 +5,7 @@
     <string name="tab_all">All news</string>
     <string name="tab_other">Others</string>
     <string name="tab_favourite">Favourites</string>
+    <string name="toolbar_article_full_title">Full Article</string>
+    <string name="toolbar_action_share">share</string>
+    <string name="toolbar_action_favorite">favorite</string>
 </resources>

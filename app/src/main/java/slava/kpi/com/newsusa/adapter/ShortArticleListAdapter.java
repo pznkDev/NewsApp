@@ -1,6 +1,5 @@
 package slava.kpi.com.newsusa.adapter;
 
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,6 +21,17 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
     List<ArticleShort> allNews = new ArrayList<ArticleShort>();
     Context context;
 
+    public interface OnArticleClickListener {
+        void onClick(String articleFullURL, String title);
+    }
+
+    private OnArticleClickListener mArticleClickListener;
+
+    public void setArticleListener (OnArticleClickListener mArticleClickListener) {
+        this.mArticleClickListener = mArticleClickListener;
+    }
+
+
     public ShortArticleListAdapter(Context context, List<ArticleShort> allNews) {
         this.allNews = allNews;
         this.context = context;
@@ -35,14 +45,23 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.tvTitle.setText(allNews.get(position).getTitle());
         holder.tvDate.setText(allNews.get(position).getDate());
-        if (allNews.get(position).getImgURL() != "") {
+        // if article has image then load it, otherwise don't load image
+        if (allNews.get(position).getImgURL() != "")
             Picasso.with(context)
                     .load(allNews.get(position).getImgURL())
                     .into(holder.img);
-        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mArticleClickListener != null) {
+                    mArticleClickListener.onClick(allNews.get(position).getFullArticleURL(), allNews.get(position).getTitle());
+                }
+            }
+        });
     }
 
     @Override
