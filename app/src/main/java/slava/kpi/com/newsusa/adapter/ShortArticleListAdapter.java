@@ -53,11 +53,11 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
         holder.tvTitle.setText(allNews.get(position).getTitle());
         holder.tvDate.setText(allNews.get(position).getDate());
         // if article has image then load it, otherwise don't load image
-        if (allNews.get(position).getImgURL().equals("")) holder.tvCap.setVisibility(View.VISIBLE);
+        if (allNews.get(position).getImgBigURL().equals("")) holder.tvCap.setVisibility(View.VISIBLE);
         else {
             holder.img.setVisibility(View.VISIBLE);
             Picasso.with(context)
-                    .load(allNews.get(position).getImgURL())
+                    .load(allNews.get(position).getImgBigURL())
                     .into(holder.img);
         }
 

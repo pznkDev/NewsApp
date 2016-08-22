@@ -13,7 +13,8 @@
 
         <RelativeLayout
             android:layout_width="100dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp">
 
             <ImageView
                 android:id="@+id/img_view_article_short"

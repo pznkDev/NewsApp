@@ -2,15 +2,15 @@ package slava.kpi.com.newsusa.entities;
 
 public class ArticleShort {
 
-    private String title, imgURL, fullArticleURL, date;
+    private String title, imgSmallURL, imgBigURL, fullArticleURL, date;
 
     public ArticleShort() {
     }
 
-    public ArticleShort(String title, String imgURL, String fullArticleURL, String date) {
-
+    public ArticleShort(String title, String imgSmallURL, String imgBigURL, String fullArticleURL, String date) {
         this.title = title;
-        this.imgURL = imgURL;
+        this.imgSmallURL = imgSmallURL;
+        this.imgBigURL = imgBigURL;
         this.fullArticleURL = fullArticleURL;
         this.date = date;
     }
@@ -23,12 +23,20 @@ public class ArticleShort {
         this.title = title;
     }
 
-    public String getImgURL() {
-        return imgURL;
+    public String getImgSmallURL() {
+        return imgSmallURL;
     }
 
-    public void setImgURL(String imgURL) {
-        this.imgURL = imgURL;
+    public void setImgSmallURL(String imgSmallURL) {
+        this.imgSmallURL = imgSmallURL;
+    }
+
+    public String getImgBigURL() {
+        return imgBigURL;
+    }
+
+    public void setImgBigURL(String imgBigURL) {
+        this.imgBigURL = imgBigURL;
     }
 
     public String getFullArticleURL() {

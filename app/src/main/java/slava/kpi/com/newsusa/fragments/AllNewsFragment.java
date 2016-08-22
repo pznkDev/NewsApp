@@ -128,7 +128,7 @@ public class AllNewsFragment extends Fragment {
 
     private void getNewsOnPage(int page) {
         String fullURL = Constants.URL_NEWS;
-        if (page>1) fullURL = fullURL + "?page=" + page;
+        if (page > 1) fullURL = fullURL + "?page=" + page;
         else {
             loadingAnimation.setVisibility(View.VISIBLE);
             loadingAnimation.show();
@@ -160,11 +160,19 @@ public class AllNewsFragment extends Fragment {
 
                         // parse each article
                         Element image = part.select("img").first();
-                        String imgURL;
-                        if (image != null) imgURL = image.attr("src");
-                        else imgURL = "";
+                        String imgSmallURL = "";
+                        String imgBigURL = "";
+                        if (image != null) {
+                            String imgCode = image.attr("data-srcset");
+                            int commaIndex = imgCode.indexOf(",");
+                            imgSmallURL = imgCode.substring(0, commaIndex);
+                            imgBigURL = imgCode.substring(commaIndex+2);
+                        }
+
                         // create new short article and add it to list
-                        allNews.add(new ArticleShort(part.select("h3").first().text(), imgURL,
+                        allNews.add(new ArticleShort(part.select("h3").first().text(),
+                                imgSmallURL,
+                                imgBigURL,
                                 part.select("a").first().attr("href"),
                                 part.select("p.date").first().text()));
                     }
@@ -180,8 +188,10 @@ public class AllNewsFragment extends Fragment {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             //if success then show add news in adapter
-            if (flagSuccess) rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size()-30, allNews.size());
-            else Toast.makeText(getContext(), "Oops, something went wrong" + allNews.size(), Toast.LENGTH_SHORT).show();
+            if (flagSuccess)
+                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size() - 30, allNews.size());
+            else
+                Toast.makeText(getContext(), "Oops, something went wrong" + allNews.size(), Toast.LENGTH_SHORT).show();
             loadingAnimation.hide();
 
         }

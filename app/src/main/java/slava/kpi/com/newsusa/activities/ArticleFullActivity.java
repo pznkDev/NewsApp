@@ -5,18 +5,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class ArticleFullActivity extends AppCompatActivity {
     private boolean flagSuccess = false;
 
     private TextView tvTitle;
+    private ImageView imgBig;
     private HtmlTextView tvText;
     private AVLoadingIndicatorView loadingAnimation;
 
@@ -53,6 +55,7 @@ public class ArticleFullActivity extends AppCompatActivity {
         tvTitle = (TextView) findViewById(R.id.tv_article_full_title);
         tvTitle.setText(title);
         tvText = (HtmlTextView) findViewById(R.id.tv_article_full_text);
+        imgBig = (ImageView) findViewById(R.id.img_view_article_full_img_big);
 
         loadingAnimation = (AVLoadingIndicatorView) findViewById(R.id.avi_full_article);
 
@@ -74,7 +77,8 @@ public class ArticleFullActivity extends AppCompatActivity {
 
     private class FullArticleParser extends AsyncTask<String, String, String> {
 
-        StringBuilder fullText = new StringBuilder();
+        String fullText;
+        String imgURL = "";
 
         @Override
         protected void onPreExecute() {
@@ -93,14 +97,23 @@ public class ArticleFullActivity extends AppCompatActivity {
 
             if (doc != null) {
 
-                Element element = doc.select("div.story-copy.clearfix").first();
+                // get main article's image url
+                Element imgElement = doc.select("div.article-image").first();
 
-                //split into strings
-                Elements parts = element.select("p");
-                // parse ech of strings
-                for (Element part : parts) {
-                    fullText.append(part);
+                if (imgElement != null) {
+                    Element image = imgElement.select("img").first();
+                    imgURL = image.attr("src");
                 }
+
+                // get main article's text
+                Element textElement = doc.select("div.story-copy.clearfix").first();
+
+                String text = textElement.toString();
+
+                // delete all \n for regular expressions processing
+                text = text.replaceAll("\n", "");
+                // remove all unnecessary parts
+                fullText = text.replaceAll("(<figure).*(</figure>)", "");
 
                 flagSuccess = true;
             } else flagSuccess = false;
@@ -113,10 +126,16 @@ public class ArticleFullActivity extends AppCompatActivity {
             super.onPostExecute(s);
             loadingAnimation.hide();
             if (flagSuccess) {
-                Log.d("myTag", fullText.toString());
+
+                if(!imgURL.equals(""))
+                    Picasso.with(getApplicationContext())
+                        .load(imgURL)
+                        .into(imgBig);
+
                 tvText.setHtml(fullText.toString(), new HtmlHttpImageGetter(tvText));
                 tvTitle.setVisibility(View.VISIBLE);
-            } else Toast.makeText(getApplicationContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getApplicationContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
 
         }
     }
