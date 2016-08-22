@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,6 +8,7 @@
     tools:context="slava.kpi.com.newsusa.activities.ArticleFullActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -21,6 +22,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView
+        android:layout_below="@id/appBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -36,16 +38,31 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="7dp"
                 android:text="Full Article"
-                android:textSize="40sp"
+                android:textSize="25sp"
                 android:textStyle="bold"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:textColor="@android:color/black"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"/>
 
-            <TextView
+            <org.sufficientlysecure.htmltextview.HtmlTextView
                 android:id="@+id/tv_article_full_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="7dp" />
+                android:textAppearance="@android:style/TextAppearance.Medium"
+                android:layout_margin="10dp"
+                android:textSize="14sp"/>
+
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/avi_full_article"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/AVLoadingIndicatorView.Large"
+        android:layout_centerInParent="true"
+        app:indicatorName="BallRotateIndicator"
+        app:indicatorColor="@android:color/black"/>
+
+</RelativeLayout>

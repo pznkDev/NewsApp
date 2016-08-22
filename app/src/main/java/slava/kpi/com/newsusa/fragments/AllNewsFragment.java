@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -46,6 +49,10 @@ public class AllNewsFragment extends Fragment {
     private ShortArticleListAdapter shortArticleListAdapter;
     private EndlessRecyclerOnScrollListener recyclerOnScrollListener;
     private SwipeRefreshLayout swipeRefresh;
+
+    private AVLoadingIndicatorView loadingAnimation;
+
+    private FloatingActionButton fab;
 
     public static AllNewsFragment getInstance() {
         Bundle args = new Bundle();
@@ -103,6 +110,16 @@ public class AllNewsFragment extends Fragment {
             }
         });
 
+        fab = (FloatingActionButton) view.findViewById(R.id.fab_all_news_up);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutManager.scrollToPositionWithOffset(0, 0);
+            }
+        });
+
+        loadingAnimation = (AVLoadingIndicatorView) view.findViewById(R.id.avi_all_news);
+
         // if launch first time -> load first 30 news
         if (allNews.size() == 0) getNewsOnPage(1);
 
@@ -112,6 +129,10 @@ public class AllNewsFragment extends Fragment {
     private void getNewsOnPage(int page) {
         String fullURL = Constants.URL_NEWS;
         if (page>1) fullURL = fullURL + "?page=" + page;
+        else {
+            loadingAnimation.setVisibility(View.VISIBLE);
+            loadingAnimation.show();
+        }
         new LoadNews().execute(fullURL);
     }
 
@@ -120,11 +141,6 @@ public class AllNewsFragment extends Fragment {
     }
 
     private class LoadNews extends AsyncTask<String, String, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
 
         @Override
         protected String doInBackground(String... strings) {
@@ -144,7 +160,7 @@ public class AllNewsFragment extends Fragment {
 
                         // parse each article
                         Element image = part.select("img").first();
-                        String imgURL = new String();
+                        String imgURL;
                         if (image != null) imgURL = image.attr("src");
                         else imgURL = "";
                         // create new short article and add it to list
@@ -163,11 +179,10 @@ public class AllNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (flagSuccess) {
-                Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
-                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size()-30, allNews.size());
-            }
+            //if success then show add news in adapter
+            if (flagSuccess) rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size()-30, allNews.size());
             else Toast.makeText(getContext(), "Oops, something went wrong" + allNews.size(), Toast.LENGTH_SHORT).show();
+            loadingAnimation.hide();
 
         }
     }

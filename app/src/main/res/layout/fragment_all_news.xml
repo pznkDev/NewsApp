@@ -1,19 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
     android:orientation="vertical">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_all_news"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rec_view_short_article_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_all_news"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-    </android.support.v4.widget.SwipeRefreshLayout>
-</LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rec_view_short_article_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_all_news_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
+            app:layout_anchor="@id/rec_view_short_article_list"
+            app:layout_anchorGravity="bottom|end"
+            app:layout_behavior="slava.kpi.com.newsusa.other.FABScrollBehavior" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/avi_all_news"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/AVLoadingIndicatorView.Large"
+        android:layout_centerInParent="true"
+        app:indicatorName="BallRotateIndicator"
+        app:indicatorColor="@android:color/black"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

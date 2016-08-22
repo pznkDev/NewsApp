@@ -2,23 +2,28 @@ package slava.kpi.com.newsusa.activities;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wang.avi.AVLoadingIndicatorView;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
 
 import slava.kpi.com.newsusa.Constants;
 import slava.kpi.com.newsusa.R;
+import slava.kpi.com.newsusa.other.HtmlHttpImageGetter;
 
 public class ArticleFullActivity extends AppCompatActivity {
 
@@ -27,11 +32,14 @@ public class ArticleFullActivity extends AppCompatActivity {
     private Document doc;
     private boolean flagSuccess = false;
 
-    private TextView tvTitle, tvText;
+    private TextView tvTitle;
+    private HtmlTextView tvText;
+    private AVLoadingIndicatorView loadingAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.AppDefault);
         setContentView(R.layout.activity_article_full);
 
         initToolbar();
@@ -44,7 +52,9 @@ public class ArticleFullActivity extends AppCompatActivity {
 
         tvTitle = (TextView) findViewById(R.id.tv_article_full_title);
         tvTitle.setText(title);
-        tvText = (TextView) findViewById(R.id.tv_article_full_text);
+        tvText = (HtmlTextView) findViewById(R.id.tv_article_full_text);
+
+        loadingAnimation = (AVLoadingIndicatorView) findViewById(R.id.avi_full_article);
 
         new FullArticleParser().execute(articleFullURL);
 
@@ -67,6 +77,12 @@ public class ArticleFullActivity extends AppCompatActivity {
         StringBuilder fullText = new StringBuilder();
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loadingAnimation.show();
+        }
+
+        @Override
         protected String doInBackground(String... strings) {
 
             try {
@@ -83,7 +99,7 @@ public class ArticleFullActivity extends AppCompatActivity {
                 Elements parts = element.select("p");
                 // parse ech of strings
                 for (Element part : parts) {
-                    fullText.append(part.text() + "\n");
+                    fullText.append(part);
                 }
 
                 flagSuccess = true;
@@ -95,11 +111,12 @@ public class ArticleFullActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            loadingAnimation.hide();
             if (flagSuccess) {
-                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
-                tvText.setText(fullText);
+                Log.d("myTag", fullText.toString());
+                tvText.setHtml(fullText.toString(), new HtmlHttpImageGetter(tvText));
                 tvTitle.setVisibility(View.VISIBLE);
-            } else Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+            } else Toast.makeText(getApplicationContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
 
         }
     }

@@ -8,4 +8,5 @@
     <string name="toolbar_article_full_title">Full Article</string>
     <string name="toolbar_action_share">share</string>
     <string name="toolbar_action_favorite">favorite</string>
+    <string name="read_cap">READ</string>
 </resources>

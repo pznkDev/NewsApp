@@ -16,7 +16,7 @@ import java.util.List;
 import slava.kpi.com.newsusa.R;
 import slava.kpi.com.newsusa.entities.ArticleShort;
 
-public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleListAdapter.ViewHolder>{
+public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleListAdapter.ViewHolder> {
 
     List<ArticleShort> allNews = new ArrayList<ArticleShort>();
     Context context;
@@ -27,7 +27,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
     private OnArticleClickListener mArticleClickListener;
 
-    public void setArticleListener (OnArticleClickListener mArticleClickListener) {
+    public void setArticleListener(OnArticleClickListener mArticleClickListener) {
         this.mArticleClickListener = mArticleClickListener;
     }
 
@@ -46,13 +46,20 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+
+        holder.img.setVisibility(View.INVISIBLE);
+        holder.tvCap.setVisibility(View.INVISIBLE);
+
         holder.tvTitle.setText(allNews.get(position).getTitle());
         holder.tvDate.setText(allNews.get(position).getDate());
         // if article has image then load it, otherwise don't load image
-        if (allNews.get(position).getImgURL() != "")
+        if (allNews.get(position).getImgURL().equals("")) holder.tvCap.setVisibility(View.VISIBLE);
+        else {
+            holder.img.setVisibility(View.VISIBLE);
             Picasso.with(context)
                     .load(allNews.get(position).getImgURL())
                     .into(holder.img);
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +78,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvTitle, tvDate;
+        TextView tvTitle, tvDate, tvCap;
         ImageView img;
 
         public ViewHolder(View itemView) {
@@ -79,6 +86,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
             tvTitle = (TextView) itemView.findViewById(R.id.tv_article_short_title);
             tvDate = (TextView) itemView.findViewById(R.id.tv_article_short_date);
+            tvCap = (TextView) itemView.findViewById(R.id.tv_article_short_cap);
             img = (ImageView) itemView.findViewById(R.id.img_view_article_short);
         }
     }
