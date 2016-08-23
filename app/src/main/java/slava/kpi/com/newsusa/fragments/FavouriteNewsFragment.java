@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,8 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +34,6 @@ public class FavouriteNewsFragment extends Fragment{
     private RecyclerView rvShortArticle;
     private ShortArticleListAdapter shortArticleListAdapter;
     private SwipeRefreshLayout swipeRefresh;
-
-    private AVLoadingIndicatorView loadingAnimation;
-
-    private FloatingActionButton fab;
 
     public static FavouriteNewsFragment getInstance(){
         Bundle args = new Bundle();
@@ -66,7 +59,7 @@ public class FavouriteNewsFragment extends Fragment{
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvShortArticle.setLayoutManager(layoutManager);
 
-        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getFavoriteNews());
+        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), favoriteNews);
         rvShortArticle.setAdapter(shortArticleListAdapter);
 
         shortArticleListAdapter.setArticleListener(new ShortArticleListAdapter.OnArticleClickListener() {
@@ -87,38 +80,24 @@ public class FavouriteNewsFragment extends Fragment{
             public void onRefresh() {
                 shortArticleListAdapter.notifyItemRangeRemoved(0, favoriteNews.size());
                 favoriteNews.clear();
-                // TODO refresh list
-                getFavoriteNews();
+
+                loadFavoriteNews();
 
                 swipeRefresh.setRefreshing(false);
             }
         });
-
-        fab = (FloatingActionButton) view.findViewById(R.id.fab_favorite_news_up);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                layoutManager.scrollToPositionWithOffset(0, 0);
-            }
-        });
-
-
+        if (favoriteNews.size() == 0) loadFavoriteNews();
 
         return view;
     }
 
-    private List<ArticleShort> getFavoriteNews() {
-
-        List<ArticleShort> favoriteNews = new ArrayList<>();
-
-        // load all unread books
-
+    private void loadFavoriteNews() {
+        // load all favorite news
         SQLiteDatabase database = dbHelper.getReadableDatabase();
 
         Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.TABLE_ARTICLES, null);
 
         if(cursor.moveToFirst()) {
-            int id = cursor.getColumnIndex(DBHelper.KEY_ID);
             int titleIndex = cursor.getColumnIndex(DBHelper.KEY_TITLE);
             int imgSmallIndex = cursor.getColumnIndex(DBHelper.KEY_IMG_SMALL_URL);
             int imgBigIndex = cursor.getColumnIndex(DBHelper.KEY_IMG_BIG_URL);
@@ -137,6 +116,6 @@ public class FavouriteNewsFragment extends Fragment{
         cursor.close();
         dbHelper.close();
 
-        return favoriteNews;
+        rvShortArticle.getAdapter().notifyItemRangeInserted(0, favoriteNews.size());
     }
 }

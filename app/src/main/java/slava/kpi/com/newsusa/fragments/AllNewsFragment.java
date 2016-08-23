@@ -35,7 +35,6 @@ import slava.kpi.com.newsusa.listeners.EndlessRecyclerOnScrollListener;
 public class AllNewsFragment extends Fragment {
 
     public static final String TAG = "AllNewsFragment";
-    private final String LOG_TAG = "myTag";
 
     private final int LAYOUT = R.layout.fragment_all_news;
 
@@ -82,7 +81,7 @@ public class AllNewsFragment extends Fragment {
         };
         rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
 
-        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getAllNews());
+        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), allNews);
         rvShortArticle.setAdapter(shortArticleListAdapter);
 
         // set Listener for rec view adapter. Tap on short article -> open new Activity for detailed info
@@ -136,10 +135,6 @@ public class AllNewsFragment extends Fragment {
         new LoadNews().execute(fullURL);
     }
 
-    private List<ArticleShort> getAllNews() {
-        return allNews;
-    }
-
     private class LoadNews extends AsyncTask<String, String, String> {
 
         @Override
@@ -166,7 +161,7 @@ public class AllNewsFragment extends Fragment {
                             String imgCode = image.attr("data-srcset");
                             int commaIndex = imgCode.indexOf(",");
                             imgSmallURL = imgCode.substring(0, commaIndex);
-                            imgBigURL = imgCode.substring(commaIndex+2);
+                            imgBigURL = imgCode.substring(commaIndex + 2);
                         }
 
                         // create new short article and add it to list

@@ -7,7 +7,7 @@ import slava.kpi.com.newsusa.activities.MainActivity;
 
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
 
-    private int previousTotal = MainActivity.NEWSCOUNT-1;
+    private int previousTotal = MainActivity.NEWSCOUNT;
     private boolean loading = true;
     private int visibleThreshold = 20;
     int firstVisibleItem, visibleItemCount, totalItemCount;

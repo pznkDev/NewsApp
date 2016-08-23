@@ -6,12 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class ArticleFullActivity extends AppCompatActivity {
     private Document doc;
     private boolean flagSuccess = false;
 
-    private TextView tvTitle;
+    private TextView tvTitle,tvDate;
     private ImageView imgBig;
     private HtmlTextView tvText;
     private AVLoadingIndicatorView loadingAnimation;
@@ -48,7 +49,9 @@ public class ArticleFullActivity extends AppCompatActivity {
     boolean isFavoriteArticle;
     long currentArticleDBId;
 
-    ArticleShort currentArticle;
+    private ArticleShort currentArticle;
+
+    private RelativeLayout layoutMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +66,11 @@ public class ArticleFullActivity extends AppCompatActivity {
             currentArticle = argsIntent.getParcelableExtra(Constants.EXTRA_ARTICLE_SHORT);
         }
 
+        layoutMain = (RelativeLayout) findViewById(R.id.layout_activity_article_full);
         tvTitle = (TextView) findViewById(R.id.tv_article_full_title);
         tvTitle.setText(currentArticle.getTitle());
+        tvDate = (TextView) findViewById(R.id.tv_article_full_date);
+        tvDate.setText(currentArticle.getDate());
         tvText = (HtmlTextView) findViewById(R.id.tv_article_full_text);
         imgBig = (ImageView) findViewById(R.id.img_view_article_full_img_big);
 
@@ -82,8 +88,6 @@ public class ArticleFullActivity extends AppCompatActivity {
         SQLiteDatabase database = dbHelper.getReadableDatabase();
 
         Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.TABLE_ARTICLES, null);
-
-        Log.d("myTag", "ALL = " + String.valueOf(cursor.getCount()));
 
         if (cursor.moveToFirst()) {
 
@@ -128,7 +132,7 @@ public class ArticleFullActivity extends AppCompatActivity {
 
                                 if (DelCount > 0) {
                                     deleteFromFavorite();
-                                    Toast.makeText(getApplicationContext(), "Deleted from Favorites", Toast.LENGTH_SHORT).show();
+                                    Snackbar.make(layoutMain, "Deleted from favorites", Snackbar.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -148,14 +152,12 @@ public class ArticleFullActivity extends AppCompatActivity {
 
                             addToFavorite(currentArticleDBId);
 
-                            Toast.makeText(getApplicationContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(layoutMain, "Added to favorites", Snackbar.LENGTH_SHORT).show();
                         }
                         break;
 
                     case R.id.toolbar_article_full_item_share:
-
-                        Log.d("myTag", String.valueOf(currentArticleDBId));
-
+                        // share function
                         break;
                 }
                 return false;
@@ -223,6 +225,7 @@ public class ArticleFullActivity extends AppCompatActivity {
 
                 tvText.setHtml(fullText.toString(), new HtmlHttpImageGetter(tvText));
                 tvTitle.setVisibility(View.VISIBLE);
+                tvDate.setVisibility(View.VISIBLE);
             } else
                 Toast.makeText(getApplicationContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
 
