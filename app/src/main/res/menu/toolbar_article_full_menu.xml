@@ -10,6 +10,5 @@
     <item android:id="@+id/toolbar_article_full_item_favorite"
         android:title="@string/toolbar_action_favorite"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_star_border_black_24dp"/>
+        app:showAsAction="ifRoom" />
 </menu>

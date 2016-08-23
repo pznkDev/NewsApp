@@ -22,7 +22,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
     Context context;
 
     public interface OnArticleClickListener {
-        void onClick(String articleFullURL, String title);
+        void onClick(ArticleShort articleShort);
     }
 
     private OnArticleClickListener mArticleClickListener;
@@ -65,7 +65,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
             @Override
             public void onClick(View view) {
                 if (mArticleClickListener != null) {
-                    mArticleClickListener.onClick(allNews.get(position).getFullArticleURL(), allNews.get(position).getTitle());
+                    mArticleClickListener.onClick(allNews.get(position));
                 }
             }
         });

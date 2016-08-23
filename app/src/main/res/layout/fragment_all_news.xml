@@ -29,8 +29,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
-            app:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
+            app:backgroundTint="@color/colorPrimary"
             app:layout_anchor="@id/rec_view_short_article_list"
             app:layout_anchorGravity="bottom|end"
             app:layout_behavior="slava.kpi.com.newsusa.other.FABScrollBehavior" />
@@ -39,12 +39,12 @@
 
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/avi_all_news"
+        style="@style/AVLoadingIndicatorView.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/AVLoadingIndicatorView.Large"
         android:layout_centerInParent="true"
-        app:indicatorName="BallRotateIndicator"
+        android:visibility="invisible"
         app:indicatorColor="@android:color/black"
-        android:visibility="invisible"/>
+        app:indicatorName="BallRotateIndicator" />
 
 </RelativeLayout>

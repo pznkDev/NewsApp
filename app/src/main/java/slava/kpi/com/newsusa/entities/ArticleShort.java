@@ -1,8 +1,11 @@
 package slava.kpi.com.newsusa.entities;
 
-public class ArticleShort {
+import android.os.Parcel;
+import android.os.Parcelable;
 
-    private String title, imgSmallURL, imgBigURL, fullArticleURL, date;
+public class ArticleShort implements Parcelable {
+
+    private String title, imgSmallURL, imgBigURL, articleFullURL, date;
 
     public ArticleShort() {
     }
@@ -11,9 +14,29 @@ public class ArticleShort {
         this.title = title;
         this.imgSmallURL = imgSmallURL;
         this.imgBigURL = imgBigURL;
-        this.fullArticleURL = fullArticleURL;
+        this.articleFullURL = fullArticleURL;
         this.date = date;
     }
+
+    protected ArticleShort(Parcel in) {
+        title = in.readString();
+        imgSmallURL = in.readString();
+        imgBigURL = in.readString();
+        articleFullURL = in.readString();
+        date = in.readString();
+    }
+
+    public static final Creator<ArticleShort> CREATOR = new Creator<ArticleShort>() {
+        @Override
+        public ArticleShort createFromParcel(Parcel in) {
+            return new ArticleShort(in);
+        }
+
+        @Override
+        public ArticleShort[] newArray(int size) {
+            return new ArticleShort[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -39,12 +62,12 @@ public class ArticleShort {
         this.imgBigURL = imgBigURL;
     }
 
-    public String getFullArticleURL() {
-        return fullArticleURL;
+    public String getArticleFullURL() {
+        return articleFullURL;
     }
 
-    public void setFullArticleURL(String fullArticleURL) {
-        this.fullArticleURL = fullArticleURL;
+    public void setArticleFullURL(String articleFullURL) {
+        this.articleFullURL = articleFullURL;
     }
 
     public String getDate() {
@@ -53,5 +76,19 @@ public class ArticleShort {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(imgSmallURL);
+        parcel.writeString(imgBigURL);
+        parcel.writeString(articleFullURL);
+        parcel.writeString(date);
     }
 }

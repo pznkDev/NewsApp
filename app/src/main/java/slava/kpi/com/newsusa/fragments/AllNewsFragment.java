@@ -84,14 +84,13 @@ public class AllNewsFragment extends Fragment {
         shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getAllNews());
         rvShortArticle.setAdapter(shortArticleListAdapter);
 
-        // set Listener for rec view adapter. Tap on short article -> open new Activity fro detailed info
+        // set Listener for rec view adapter. Tap on short article -> open new Activity for detailed info
         shortArticleListAdapter.setArticleListener(new ShortArticleListAdapter.OnArticleClickListener() {
             @Override
-            public void onClick(String articleFullURL, String title) {
-                String finalArticleFullURL = Constants.URL_ARTICLE_SHORT + articleFullURL;
+            public void onClick(ArticleShort articleShort) {
+                ArticleShort articleShortOpen = articleShort;
                 Intent articleFullIntent = new Intent(getActivity(), ArticleFullActivity.class);
-                articleFullIntent.putExtra(Constants.EXTRA_TITLE, title);
-                articleFullIntent.putExtra(Constants.EXTRA_ARTICLE_FULL_URL, finalArticleFullURL);
+                articleFullIntent.putExtra(Constants.EXTRA_ARTICLE_SHORT, articleShortOpen);
                 startActivity(articleFullIntent);
             }
         });
@@ -173,7 +172,7 @@ public class AllNewsFragment extends Fragment {
                         allNews.add(new ArticleShort(part.select("h3").first().text(),
                                 imgSmallURL,
                                 imgBigURL,
-                                part.select("a").first().attr("href"),
+                                Constants.URL_ARTICLE_SHORT + part.select("a").first().attr("href"),
                                 part.select("p.date").first().text()));
                     }
                 }

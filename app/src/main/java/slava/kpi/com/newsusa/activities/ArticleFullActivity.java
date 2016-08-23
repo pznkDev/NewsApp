@@ -1,10 +1,14 @@
 package slava.kpi.com.newsusa.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,11 +28,12 @@ import java.io.IOException;
 
 import slava.kpi.com.newsusa.Constants;
 import slava.kpi.com.newsusa.R;
+import slava.kpi.com.newsusa.database.DBHelper;
+import slava.kpi.com.newsusa.entities.ArticleShort;
 import slava.kpi.com.newsusa.other.HtmlHttpImageGetter;
 
 public class ArticleFullActivity extends AppCompatActivity {
 
-    private String title, articleFullURL;
     private Toolbar toolbar;
     private Document doc;
     private boolean flagSuccess = false;
@@ -37,6 +42,13 @@ public class ArticleFullActivity extends AppCompatActivity {
     private ImageView imgBig;
     private HtmlTextView tvText;
     private AVLoadingIndicatorView loadingAnimation;
+
+    private DBHelper dbHelper;
+
+    boolean isFavoriteArticle;
+    long currentArticleDBId;
+
+    ArticleShort currentArticle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +60,52 @@ public class ArticleFullActivity extends AppCompatActivity {
 
         Intent argsIntent = getIntent();
         if (argsIntent != null) {
-            title = argsIntent.getStringExtra(Constants.EXTRA_TITLE);
-            articleFullURL = argsIntent.getStringExtra(Constants.EXTRA_ARTICLE_FULL_URL);
+            currentArticle = argsIntent.getParcelableExtra(Constants.EXTRA_ARTICLE_SHORT);
         }
 
         tvTitle = (TextView) findViewById(R.id.tv_article_full_title);
-        tvTitle.setText(title);
+        tvTitle.setText(currentArticle.getTitle());
         tvText = (HtmlTextView) findViewById(R.id.tv_article_full_text);
         imgBig = (ImageView) findViewById(R.id.img_view_article_full_img_big);
 
         loadingAnimation = (AVLoadingIndicatorView) findViewById(R.id.avi_full_article);
 
-        new FullArticleParser().execute(articleFullURL);
+        new FullArticleParser().execute(currentArticle.getArticleFullURL());
 
+        dbHelper = new DBHelper(this);
+
+        setIconFavorite();
+    }
+
+    private void setIconFavorite() {
+        // check if this article is in favorite list (stored in database)
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+
+        Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.TABLE_ARTICLES, null);
+
+        Log.d("myTag", "ALL = " + String.valueOf(cursor.getCount()));
+
+        if (cursor.moveToFirst()) {
+
+            int urlIndex = cursor.getColumnIndex(DBHelper.KEY_ARTICLE_FULL_URL);
+
+            do {
+                if (cursor.getString(urlIndex).equals(currentArticle.getArticleFullURL())) {
+                    // menu item set image
+                    addToFavorite(cursor.getPosition());
+                    Log.d("myTag", "Current = " + String.valueOf(currentArticleDBId));
+                    break;
+                }
+
+            } while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        dbHelper.close();
+
+        if (!isFavoriteArticle) {
+            deleteFromFavorite();
+        }
     }
 
     private void initToolbar() {
@@ -69,6 +114,50 @@ public class ArticleFullActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.toolbar_article_full_item_favorite:
+
+                        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+                        if (isFavoriteArticle) {
+                            //it is favorite now, so delete this article from favorites
+
+                            //delete article from database
+                            if (currentArticleDBId != -1) {
+                                int DelCount = database.delete(DBHelper.TABLE_ARTICLES, DBHelper.KEY_ID + "=" + currentArticleDBId, null);
+
+                                if (DelCount > 0) {
+                                    deleteFromFavorite();
+                                    Toast.makeText(getApplicationContext(), "Deleted from Favorites", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } else {
+                            //it is not favorite now, so add it to favorites
+
+                            // save article(title, url) in database
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(DBHelper.KEY_TITLE, currentArticle.getTitle());
+                            contentValues.put(DBHelper.KEY_IMG_SMALL_URL, currentArticle.getImgSmallURL());
+                            contentValues.put(DBHelper.KEY_IMG_BIG_URL, currentArticle.getImgBigURL());
+                            contentValues.put(DBHelper.KEY_ARTICLE_FULL_URL, currentArticle.getArticleFullURL());
+                            contentValues.put(DBHelper.KEY_DATE, currentArticle.getDate());
+
+                            currentArticleDBId = database.insert(DBHelper.TABLE_ARTICLES, null, contentValues);
+                            dbHelper.close();
+
+                            addToFavorite(currentArticleDBId);
+
+                            Toast.makeText(getApplicationContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+
+                    case R.id.toolbar_article_full_item_share:
+
+                        Log.d("myTag", String.valueOf(currentArticleDBId));
+
+                        break;
+                }
                 return false;
             }
         });
@@ -127,10 +216,10 @@ public class ArticleFullActivity extends AppCompatActivity {
             loadingAnimation.hide();
             if (flagSuccess) {
 
-                if(!imgURL.equals(""))
+                if (!imgURL.equals(""))
                     Picasso.with(getApplicationContext())
-                        .load(imgURL)
-                        .into(imgBig);
+                            .load(imgURL)
+                            .into(imgBig);
 
                 tvText.setHtml(fullText.toString(), new HtmlHttpImageGetter(tvText));
                 tvTitle.setVisibility(View.VISIBLE);
@@ -138,6 +227,18 @@ public class ArticleFullActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    private void addToFavorite(long currentId) {
+        toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_star_added);
+        isFavoriteArticle = true;
+        currentArticleDBId = currentId;
+    }
+
+    private void deleteFromFavorite() {
+        toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_star);
+        isFavoriteArticle = false;
+        currentArticleDBId = -1;
     }
 
 }
