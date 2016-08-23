@@ -74,10 +74,10 @@ public class ArticleFullActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-        setIconFavorite();
+        checkIfFavorite();
     }
 
-    private void setIconFavorite() {
+    private void checkIfFavorite() {
         // check if this article is in favorite list (stored in database)
         SQLiteDatabase database = dbHelper.getReadableDatabase();
 
@@ -87,13 +87,13 @@ public class ArticleFullActivity extends AppCompatActivity {
 
         if (cursor.moveToFirst()) {
 
+            int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
             int urlIndex = cursor.getColumnIndex(DBHelper.KEY_ARTICLE_FULL_URL);
 
             do {
                 if (cursor.getString(urlIndex).equals(currentArticle.getArticleFullURL())) {
                     // menu item set image
-                    addToFavorite(cursor.getPosition());
-                    Log.d("myTag", "Current = " + String.valueOf(currentArticleDBId));
+                    addToFavorite(cursor.getInt(idIndex));
                     break;
                 }
 

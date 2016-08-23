@@ -81,6 +81,7 @@ public class AllNewsFragment extends Fragment {
             }
         };
         rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
+
         shortArticleListAdapter = new ShortArticleListAdapter(getContext(), getAllNews());
         rvShortArticle.setAdapter(shortArticleListAdapter);
 
