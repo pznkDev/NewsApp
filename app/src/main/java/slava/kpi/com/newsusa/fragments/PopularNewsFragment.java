@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,11 +29,10 @@ import slava.kpi.com.newsusa.R;
 import slava.kpi.com.newsusa.activities.ArticleFullActivity;
 import slava.kpi.com.newsusa.adapter.ShortArticleListAdapter;
 import slava.kpi.com.newsusa.entities.ArticleShort;
-import slava.kpi.com.newsusa.listeners.EndlessRecyclerOnScrollListener;
 
-public class AllNewsFragment extends Fragment {
+public class PopularNewsFragment extends Fragment {
 
-    private final int LAYOUT = R.layout.fragment_all_news;
+    private final int LAYOUT = R.layout.fragment_popular_news;
 
     private View view;
 
@@ -44,42 +42,31 @@ public class AllNewsFragment extends Fragment {
 
     private RecyclerView rvShortArticle;
     private ShortArticleListAdapter shortArticleListAdapter;
-    private EndlessRecyclerOnScrollListener recyclerOnScrollListener;
     private SwipeRefreshLayout swipeRefresh;
 
     private AVLoadingIndicatorView loadingAnimation;
 
-    private FloatingActionButton fab;
-
-    public static AllNewsFragment getInstance() {
+    public static PopularNewsFragment getInstance() {
         Bundle args = new Bundle();
-        AllNewsFragment allNewsFragment = new AllNewsFragment();
-        allNewsFragment.setArguments(args);
+        PopularNewsFragment popularNewsFragment = new PopularNewsFragment();
+        popularNewsFragment.setArguments(args);
 
-        return allNewsFragment;
+        return popularNewsFragment;
     }
 
-    private List<ArticleShort> allNews = new ArrayList<>();
+    private List<ArticleShort> popularNews = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
-        rvShortArticle = (RecyclerView) view.findViewById(R.id.rec_view_short_article_list);
+        rvShortArticle = (RecyclerView) view.findViewById(R.id.rec_view_short_article_popular_list);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvShortArticle.setLayoutManager(layoutManager);
-        // load news on next page when approaching to the end of list
-        recyclerOnScrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                getNewsOnPage(current_page);
-            }
-        };
-        rvShortArticle.setOnScrollListener(recyclerOnScrollListener);
 
-        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), allNews);
+        shortArticleListAdapter = new ShortArticleListAdapter(getContext(), popularNews);
         rvShortArticle.setAdapter(shortArticleListAdapter);
 
         // set Listener for rec view adapter. Tap on short article -> open new Activity for detailed info
@@ -95,45 +82,34 @@ public class AllNewsFragment extends Fragment {
 
         //refresh recyclerView
         //clear all news in List, clear adapterList
-        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_all_news);
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_popular_news);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                shortArticleListAdapter.notifyItemRangeRemoved(0, allNews.size());
-                allNews.clear();
-                recyclerOnScrollListener.refresh();
-                getNewsOnPage(1);
+                shortArticleListAdapter.notifyItemRangeRemoved(0, popularNews.size());
+                popularNews.clear();
+                loadPopularNews();
                 swipeRefresh.setRefreshing(false);
             }
         });
 
-        fab = (FloatingActionButton) view.findViewById(R.id.fab_all_news_up);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                layoutManager.scrollToPositionWithOffset(0, 0);
-            }
-        });
+        loadingAnimation = (AVLoadingIndicatorView) view.findViewById(R.id.avi_popular_news);
 
-        loadingAnimation = (AVLoadingIndicatorView) view.findViewById(R.id.avi_all_news);
-
-        // if launch first time -> load first 30 news
-        if (allNews.size() == 0) getNewsOnPage(1);
+        // if launch first time -> load articles with images
+        if (popularNews.size() == 0) loadPopularNews();
 
         return view;
     }
 
-    private void getNewsOnPage(int page) {
-        String fullURL = Constants.URL_NEWS;
-        if (page > 1) fullURL = fullURL + "?page=" + page;
-        else {
-            loadingAnimation.setVisibility(View.VISIBLE);
-            loadingAnimation.show();
-        }
-        new LoadNews().execute(fullURL);
+    private void loadPopularNews() {
+        loadingAnimation.setVisibility(View.VISIBLE);
+        loadingAnimation.show();
+        new LoadPopularNews().execute(Constants.URL_NEWS);
     }
 
-    private class LoadNews extends AsyncTask<String, String, String> {
+    private class LoadPopularNews extends AsyncTask<String, String, String> {
+
+        // load all news on first page only with images
 
         @Override
         protected String doInBackground(String... strings) {
@@ -155,19 +131,22 @@ public class AllNewsFragment extends Fragment {
                         Element image = part.select("img").first();
                         String imgSmallURL = "";
                         String imgBigURL = "";
+
+                        // if article contains image then add this article to the popularList
                         if (image != null) {
                             String imgCode = image.attr("data-srcset");
                             int commaIndex = imgCode.indexOf(",");
                             imgSmallURL = imgCode.substring(0, commaIndex);
                             imgBigURL = imgCode.substring(commaIndex + 2);
+
+                            // create new short article and add it to list
+                            popularNews.add(new ArticleShort(part.select("h3").first().text(),
+                                    imgSmallURL,
+                                    imgBigURL,
+                                    Constants.URL_ARTICLE_SHORT + part.select("a").first().attr("href"),
+                                    part.select("p.date").first().text()));
                         }
 
-                        // create new short article and add it to list
-                        allNews.add(new ArticleShort(part.select("h3").first().text(),
-                                imgSmallURL,
-                                imgBigURL,
-                                Constants.URL_ARTICLE_SHORT + part.select("a").first().attr("href"),
-                                part.select("p.date").first().text()));
                     }
                 }
 
@@ -180,13 +159,13 @@ public class AllNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            //if success then show added news in adapter
+            //if success then show add news in adapter
             if (flagSuccess)
-                rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size() - 30, allNews.size());
+                rvShortArticle.getAdapter().notifyItemRangeInserted(0, popularNews.size());
             else
                 Toast.makeText(getContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
             loadingAnimation.hide();
-
         }
     }
+
 }

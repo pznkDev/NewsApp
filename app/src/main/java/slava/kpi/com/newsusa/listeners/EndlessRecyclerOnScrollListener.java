@@ -43,10 +43,10 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
     }
 
-    public void refresh(){
+    public void refresh() {
         loading = true;
         previousTotal = 0;
-        current_page=1;
+        current_page = 1;
     }
 
     public abstract void onLoadMore(int current_page);

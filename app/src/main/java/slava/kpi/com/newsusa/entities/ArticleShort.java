@@ -7,9 +7,6 @@ public class ArticleShort implements Parcelable {
 
     private String title, imgSmallURL, imgBigURL, articleFullURL, date;
 
-    public ArticleShort() {
-    }
-
     public ArticleShort(String title, String imgSmallURL, String imgBigURL, String fullArticleURL, String date) {
         this.title = title;
         this.imgSmallURL = imgSmallURL;
@@ -42,40 +39,20 @@ public class ArticleShort implements Parcelable {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getImgSmallURL() {
         return imgSmallURL;
-    }
-
-    public void setImgSmallURL(String imgSmallURL) {
-        this.imgSmallURL = imgSmallURL;
     }
 
     public String getImgBigURL() {
         return imgBigURL;
     }
 
-    public void setImgBigURL(String imgBigURL) {
-        this.imgBigURL = imgBigURL;
-    }
-
     public String getArticleFullURL() {
         return articleFullURL;
     }
 
-    public void setArticleFullURL(String articleFullURL) {
-        this.articleFullURL = articleFullURL;
-    }
-
     public String getDate() {
         return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     @Override

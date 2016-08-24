@@ -23,9 +23,7 @@ import slava.kpi.com.newsusa.adapter.ShortArticleListAdapter;
 import slava.kpi.com.newsusa.database.DBHelper;
 import slava.kpi.com.newsusa.entities.ArticleShort;
 
-public class FavouriteNewsFragment extends Fragment{
-
-    public static final String TAG = "FavouriteNewsFragment";
+public class FavouriteNewsFragment extends Fragment {
 
     private final int LAYOUT = R.layout.fragment_favourite_news;
 
@@ -35,7 +33,7 @@ public class FavouriteNewsFragment extends Fragment{
     private ShortArticleListAdapter shortArticleListAdapter;
     private SwipeRefreshLayout swipeRefresh;
 
-    public static FavouriteNewsFragment getInstance(){
+    public static FavouriteNewsFragment getInstance() {
         Bundle args = new Bundle();
         FavouriteNewsFragment favouriteNewsFragment = new FavouriteNewsFragment();
         favouriteNewsFragment.setArguments(args);
@@ -92,12 +90,12 @@ public class FavouriteNewsFragment extends Fragment{
     }
 
     private void loadFavoriteNews() {
-        // load all favorite news
+        // load all favorite news from dataBase
         SQLiteDatabase database = dbHelper.getReadableDatabase();
 
         Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.TABLE_ARTICLES, null);
 
-        if(cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             int titleIndex = cursor.getColumnIndex(DBHelper.KEY_TITLE);
             int imgSmallIndex = cursor.getColumnIndex(DBHelper.KEY_IMG_SMALL_URL);
             int imgBigIndex = cursor.getColumnIndex(DBHelper.KEY_IMG_BIG_URL);

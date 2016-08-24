@@ -8,30 +8,28 @@ import android.support.v4.app.FragmentPagerAdapter;
 import slava.kpi.com.newsusa.R;
 import slava.kpi.com.newsusa.fragments.AllNewsFragment;
 import slava.kpi.com.newsusa.fragments.FavouriteNewsFragment;
-import slava.kpi.com.newsusa.fragments.OtherNewsFragment;
+import slava.kpi.com.newsusa.fragments.PopularNewsFragment;
 
-public class TabsPagerFragmentAdapter extends FragmentPagerAdapter{
+public class TabsPagerFragmentAdapter extends FragmentPagerAdapter {
 
     private String[] tabs;
 
     public TabsPagerFragmentAdapter(Context context, FragmentManager fm) {
         super(fm);
 
-        tabs = new String[] {context.getResources().getString(R.string.tab_all),
-                            context.getResources().getString(R.string.tab_other),
-                            context.getResources().getString(R.string.tab_favourite)};
+        tabs = new String[]{context.getResources().getString(R.string.tab_popular),
+                context.getResources().getString(R.string.tab_all),
+                context.getResources().getString(R.string.tab_favourite)};
     }
 
     @Override
     public Fragment getItem(int position) {
 
-        switch (position){
+        switch (position) {
             case 0:
-                return AllNewsFragment.getInstance();
-
+                return PopularNewsFragment.getInstance();
             case 1:
-                return OtherNewsFragment.getInstance();
-
+                return AllNewsFragment.getInstance();
             case 2:
                 return FavouriteNewsFragment.getInstance();
         }

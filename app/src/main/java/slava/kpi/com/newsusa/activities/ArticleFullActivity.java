@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,7 +23,6 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
@@ -39,10 +39,12 @@ public class ArticleFullActivity extends AppCompatActivity {
     private Document doc;
     private boolean flagSuccess = false;
 
-    private TextView tvTitle,tvDate;
+    private RelativeLayout layoutMain;
+    private TextView tvTitle, tvDate;
     private ImageView imgBig;
     private HtmlTextView tvText;
     private AVLoadingIndicatorView loadingAnimation;
+    private ImageButton btnBack;
 
     private DBHelper dbHelper;
 
@@ -50,8 +52,6 @@ public class ArticleFullActivity extends AppCompatActivity {
     long currentArticleDBId;
 
     private ArticleShort currentArticle;
-
-    private RelativeLayout layoutMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,15 @@ public class ArticleFullActivity extends AppCompatActivity {
         if (argsIntent != null) {
             currentArticle = argsIntent.getParcelableExtra(Constants.EXTRA_ARTICLE_SHORT);
         }
+
+        // close activity
+        btnBack = (ImageButton) findViewById(R.id.img_btn_full_article_back);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         layoutMain = (RelativeLayout) findViewById(R.id.layout_activity_article_full);
         tvTitle = (TextView) findViewById(R.id.tv_article_full_title);
@@ -86,23 +95,18 @@ public class ArticleFullActivity extends AppCompatActivity {
     private void checkIfFavorite() {
         // check if this article is in favorite list (stored in database)
         SQLiteDatabase database = dbHelper.getReadableDatabase();
-
         Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.TABLE_ARTICLES, null);
 
         if (cursor.moveToFirst()) {
-
             int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
             int urlIndex = cursor.getColumnIndex(DBHelper.KEY_ARTICLE_FULL_URL);
-
             do {
                 if (cursor.getString(urlIndex).equals(currentArticle.getArticleFullURL())) {
-                    // menu item set image
+                    // menu item set icon
                     addToFavorite(cursor.getInt(idIndex));
                     break;
                 }
-
             } while (cursor.moveToNext());
-
         }
         cursor.close();
         dbHelper.close();
@@ -114,7 +118,6 @@ public class ArticleFullActivity extends AppCompatActivity {
 
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar_article_full);
-        toolbar.setTitle(R.string.toolbar_article_full_title);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -122,11 +125,10 @@ public class ArticleFullActivity extends AppCompatActivity {
                     case R.id.toolbar_article_full_item_favorite:
 
                         SQLiteDatabase database = dbHelper.getWritableDatabase();
-
                         if (isFavoriteArticle) {
-                            //it is favorite now, so delete this article from favorites
+                            //it is favorite now, so delete this article from favorites and from dataBase
 
-                            //delete article from database
+                            //delete article from dataBase
                             if (currentArticleDBId != -1) {
                                 int DelCount = database.delete(DBHelper.TABLE_ARTICLES, DBHelper.KEY_ID + "=" + currentArticleDBId, null);
 
@@ -137,9 +139,9 @@ public class ArticleFullActivity extends AppCompatActivity {
                             }
 
                         } else {
-                            //it is not favorite now, so add it to favorites
+                            //it is not favorite now, so add it to favorites and to dataBase
 
-                            // save article(title, url) in database
+                            // save article in dataBase
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(DBHelper.KEY_TITLE, currentArticle.getTitle());
                             contentValues.put(DBHelper.KEY_IMG_SMALL_URL, currentArticle.getImgSmallURL());
@@ -151,7 +153,6 @@ public class ArticleFullActivity extends AppCompatActivity {
                             dbHelper.close();
 
                             addToFavorite(currentArticleDBId);
-
                             Snackbar.make(layoutMain, "Added to favorites", Snackbar.LENGTH_SHORT).show();
                         }
                         break;
@@ -239,7 +240,7 @@ public class ArticleFullActivity extends AppCompatActivity {
     }
 
     private void deleteFromFavorite() {
-        toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_star);
+        toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_star_empty);
         isFavoriteArticle = false;
         currentArticleDBId = -1;
     }

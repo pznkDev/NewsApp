@@ -2,12 +2,13 @@
     <string name="app_name">NewsUSA</string>
     <string name="toolbar_search">search</string>
 
-    <string name="tab_all">All news</string>
-    <string name="tab_other">Others</string>
-    <string name="tab_favourite">Favorites</string>
+    <string name="tab_all">All</string>
+    <string name="tab_popular">Popular</string>
+    <string name="tab_favourite">Favorite</string>
     <string name="toolbar_article_full_title">Full Article</string>
     <string name="toolbar_action_share">share</string>
     <string name="toolbar_action_favorite">favorite</string>
     <string name="read_cap">READ</string>
+    <string name="toolbar_full_article_title">Full Article</string>
 
 </resources>
