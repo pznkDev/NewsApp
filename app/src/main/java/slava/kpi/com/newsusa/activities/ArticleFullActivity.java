@@ -137,7 +137,6 @@ public class ArticleFullActivity extends AppCompatActivity {
                                     Snackbar.make(layoutMain, "Deleted from favorites", Snackbar.LENGTH_SHORT).show();
                                 }
                             }
-
                         } else {
                             //it is not favorite now, so add it to favorites and to dataBase
 
@@ -150,15 +149,18 @@ public class ArticleFullActivity extends AppCompatActivity {
                             contentValues.put(DBHelper.KEY_DATE, currentArticle.getDate());
 
                             currentArticleDBId = database.insert(DBHelper.TABLE_ARTICLES, null, contentValues);
-                            dbHelper.close();
 
                             addToFavorite(currentArticleDBId);
                             Snackbar.make(layoutMain, "Added to favorites", Snackbar.LENGTH_SHORT).show();
-                        }
+                        } dbHelper.close();
                         break;
 
                     case R.id.toolbar_article_full_item_share:
-                        // share function
+                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                        intentShare.setType("text/plain");
+                        intentShare.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+                        intentShare.putExtra(Intent.EXTRA_TEXT, currentArticle.getArticleFullURL());
+                        startActivity(Intent.createChooser(intentShare, "Share URL"));
                         break;
                 }
                 return false;

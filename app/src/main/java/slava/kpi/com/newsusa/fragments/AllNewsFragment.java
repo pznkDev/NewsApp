@@ -180,12 +180,13 @@ public class AllNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            loadingAnimation.hide();
             //if success then show added news in adapter
             if (flagSuccess)
                 rvShortArticle.getAdapter().notifyItemRangeInserted(allNews.size() - 30, allNews.size());
             else
                 Toast.makeText(getContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
-            loadingAnimation.hide();
 
         }
     }

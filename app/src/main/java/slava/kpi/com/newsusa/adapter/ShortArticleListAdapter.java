@@ -45,8 +45,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        holder.img.setVisibility(View.INVISIBLE);
-        holder.tvCap.setVisibility(View.INVISIBLE);
+        holder.img.setVisibility(View.GONE);
 
         holder.tvTitle.setText(allNews.get(position).getTitle());
         holder.tvDate.setText(allNews.get(position).getDate());
@@ -57,8 +56,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
             Picasso.with(context)
                     .load(allNews.get(position).getImgBigURL())
                     .into(holder.img);
-        } else
-            holder.tvCap.setVisibility(View.VISIBLE);
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +75,7 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvTitle, tvDate, tvCap;
+        TextView tvTitle, tvDate;
         ImageView img;
 
         public ViewHolder(View itemView) {
@@ -85,7 +83,6 @@ public class ShortArticleListAdapter extends RecyclerView.Adapter<ShortArticleLi
 
             tvTitle = (TextView) itemView.findViewById(R.id.tv_article_short_title);
             tvDate = (TextView) itemView.findViewById(R.id.tv_article_short_date);
-            tvCap = (TextView) itemView.findViewById(R.id.tv_article_short_cap);
             img = (ImageView) itemView.findViewById(R.id.img_view_article_short);
         }
     }

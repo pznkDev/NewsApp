@@ -159,12 +159,13 @@ public class PopularNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            loadingAnimation.hide();
             //if success then show add news in adapter
             if (flagSuccess)
                 rvShortArticle.getAdapter().notifyItemRangeInserted(0, popularNews.size());
             else
                 Toast.makeText(getContext(), "Oops, something went wrong", Toast.LENGTH_SHORT).show();
-            loadingAnimation.hide();
         }
     }
 
